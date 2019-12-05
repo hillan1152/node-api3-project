@@ -68,12 +68,31 @@ router.get('/:id/posts', validateUserId, (req, res) => {
     })
 });
 
-router.delete('/:id', (req, res) => {
+router.delete('/:id', validateUserId, (req, res) => {
   // do your magic!
+  userDb.remove(req.params.id)
+    .then(remove => {
+      if(remove){
+        res.status(202).json({ message: `Removed Successfully.` })
+      } else {
+        res.status(404).json({ message: 'The post with specified ID does not exist.'})
+      }
+    })
+    .catch(err => {
+      res.status(400).json({ error: 'The post could not be removed'})
+   })
 });
 
-router.put('/:id', (req, res) => {
+router.put('/:id', [validateUserId, validateUser], (req, res) => {
   // do your magic!
+    userDb.update(req.params.id, req.body)
+      .then(update => {
+        res.status(200).json({...update,...req.body})
+      })
+      .catch(err => {
+        res.status(500).json({ errorMessage: 'User could not be modified'})
+      })
+
 });
 
 //custom middleware
