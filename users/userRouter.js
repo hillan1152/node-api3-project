@@ -16,8 +16,14 @@ router.post('/', validateUser, (req, res) => {
     })
 });
 
-router.post('/:id/posts', validateUserId, (req, res) => {
+router.post('/:id/posts', [validateUserId, validatePost], (req, res) => {
   // do your magic!
+  if(req.params.id){
+    postDb.insert(req.body)
+      .then(post => res.status(201).json(post))
+      .catch(err => res.status(400).json({ errorMessage: 'Error with ID'}))
+  } else
+    res.status(400).json({ message: 'Error Posting Text.'})
 });
 
 router.get('/', (req, res) => {
@@ -102,6 +108,10 @@ function validatePost(req, res, next) {
 
   if(Object.keys(postData).length === 0){
     res.status(400).json({ message: "missing post data" })
+  } else if (postData && !postData.text){
+    res.status(400).json({ message: "missing required text field" })
+  } else {
+    next()
   }
 
 }
