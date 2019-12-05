@@ -25,9 +25,9 @@ router.get('/', (req, res) => {
 
 });
 
-router.get('/:id', (req, res) => {
+router.get('/:id', validateUserId, (req, res) => {
   // do your magic!
-  const id = req.params.id
+  const id = req.user.id
 
   userDb.getById(id)
     .then(user => {
@@ -39,7 +39,7 @@ router.get('/:id', (req, res) => {
       }
     })
     .catch(err => {
-      res.status(500).json({ error: "The posts information could not be retrieved." })
+      res.status(500).json({ error: "The id could not be retrieved." })
     })
   
 });
@@ -60,14 +60,20 @@ router.put('/:id', (req, res) => {
 
 function validateUserId(req, res, next) {
   // do your magic!
-  const id = req.params.id;
-
-  if(id !== req.user.id){
-    res.status(400).json({ message: "invalid user id" })
-  } else {
-    res.json({ user: req.user })
-    next()
-  }
+    const id = req.params.id;
+    userDb.getById(id)
+      .then(user => {
+        console.log('USER', user)
+        if(!user){
+          res.status(400).json({ message: 'Invalid user id.'})
+        } else {
+          req.user = user;
+          next()
+        }
+      })
+      .catch(err => {
+        res.status(500).json({ error: "The posts information could not be retrieved."})
+      })
 }
 
 function validateUser(req, res, next) {
