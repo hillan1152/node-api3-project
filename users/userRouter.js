@@ -57,8 +57,15 @@ router.get('/:id', validateUserId, (req, res) => {
   
 });
 
-router.get('/:id/posts', (req, res) => {
+router.get('/:id/posts', validateUserId, (req, res) => {
   // do your magic!
+  postDb.getById(req.params.id)
+    .then(user => {
+        res.status(200).json(user)
+      })
+    .catch(err => {
+        res.status(400).json({ errorMessage: 'Error Getting Post' })
+    })
 });
 
 router.delete('/:id', (req, res) => {
