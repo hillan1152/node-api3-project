@@ -4,12 +4,19 @@ const router = express.Router();
 
 // IMPORT DATA
 const userDb = require('./userDb');
-
-router.post('/', (req, res) => {
+const postDb = require('../posts/postDb')
+router.post('/', validateUser, (req, res) => {
   // do your magic!
+  userDb.insert(req.body)
+    .then(newUser => {
+      res.status(201).json(newUser)
+    })
+    .catch(err => {
+      res.status(500).json({ error: "There was an error while saving the post to the database" })
+    })
 });
 
-router.post('/:id/posts', (req, res) => {
+router.post('/:id/posts', validateUserId, (req, res) => {
   // do your magic!
 });
 
@@ -78,10 +85,25 @@ function validateUserId(req, res, next) {
 
 function validateUser(req, res, next) {
   // do your magic!
+    const userData = req.body
+
+    if(Object.keys(userData).length === 0){
+      res.status(400).json({ message: "missing user data" })
+    } else if (userData && !userData.name){
+      res.status(400).json({ message: "missing required name field" })
+    } else {
+      next()
+    }
 }
 
 function validatePost(req, res, next) {
   // do your magic!
+  const postData = req.body;
+
+  if(Object.keys(postData).length === 0){
+    res.status(400).json({ message: "missing post data" })
+  }
+
 }
 
 module.exports = router;
