@@ -75,11 +75,11 @@ router.delete('/:id', validateUserId, (req, res) => {
       if(remove){
         res.status(202).json({ message: `Removed Successfully.` })
       } else {
-        res.status(404).json({ message: 'The post with specified ID does not exist.'})
+        res.status(404).json({ message: 'The user with specified ID does not exist.'})
       }
     })
     .catch(err => {
-      res.status(400).json({ error: 'The post could not be removed'})
+      res.status(400).json({ error: 'The user could not be removed'})
    })
 });
 
